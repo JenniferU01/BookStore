@@ -88,7 +88,7 @@ export default function AppNavigation() {
         <Stack.Screen
           name="BookReader"
           component={BookReaderScreen}
-          options={{ title: 'Lectura' }}
+          options={{ title: 'Leer libro' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

@@ -98,24 +98,7 @@ export default function BookDetailsScreen({ route, navigation }: Props) {
         {book.author} • {book.year}
       </Text>
 
-      {!!book.description && (
-        <>
-          <Text style={styles.sectionTitle}>Descripción</Text>
-          <Text style={styles.desc}>{book.description}</Text>
-        </>
-      )}
-
-      <TouchableOpacity
-        style={styles.readBtn}
-        onPress={() =>
-          navigation.navigate('BookReader', {
-            id: book.id,
-            title: book.title,
-          })
-        }
-      >
-        <Text style={styles.readTxt}>📖 Leer libro</Text>
-      </TouchableOpacity>
+      {!!book.description && <Text style={styles.desc}>{book.description}</Text>}
 
       <View style={styles.row}>
         <TouchableOpacity
@@ -125,6 +108,20 @@ export default function BookDetailsScreen({ route, navigation }: Props) {
           <Text style={styles.btnTxt}>
             {fav ? '★ Quitar favorito' : '☆ Agregar a favoritos'}
           </Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={[styles.btn, { backgroundColor: '#0984e3' }]}
+          onPress={() =>
+            navigation.navigate('BookReader', {
+              id: book.id,
+              title: book.title ?? 'Libro',
+            })
+          }
+        >
+          <Text style={styles.btnTxt}>Leer</Text>
         </TouchableOpacity>
       </View>
 
@@ -154,41 +151,12 @@ export default function BookDetailsScreen({ route, navigation }: Props) {
 const styles = StyleSheet.create({
   wrap: { padding: 16, paddingBottom: 32 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  cover: {
-    width: '100%',
-    height: 260,
-    borderRadius: 16,
-    marginBottom: 16,
-    backgroundColor: '#eee',
-  },
+  cover: { width: '100%', height: 260, borderRadius: 16, marginBottom: 16, backgroundColor: '#eee' },
   title: { fontSize: 22, fontWeight: '700', marginBottom: 4 },
   meta: { fontSize: 14, color: '#666', marginBottom: 12 },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 6,
-    color: '#2d3436',
-  },
-  desc: { fontSize: 15, lineHeight: 22, marginBottom: 16 },
-  readBtn: {
-    marginBottom: 20,
-    backgroundColor: '#1e293b',
-    paddingVertical: 10,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  readTxt: {
-    color: '#f9fafb',
-    fontWeight: '600',
-    fontSize: 15,
-  },
+  desc: { fontSize: 15, lineHeight: 22, marginBottom: 24 },
   row: { flexDirection: 'row', gap: 12, marginBottom: 12 },
-  btn: {
-    flex: 1,
-    paddingVertical: 10,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
+  btn: { flex: 1, paddingVertical: 10, borderRadius: 12, alignItems: 'center' },
   btnTxt: { color: '#fff', fontWeight: '600' },
   deleteBtn: {
     marginTop: 8,
