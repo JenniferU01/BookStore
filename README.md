@@ -1,50 +1,48 @@
-# 📚 BookStore
+# 📚 BookStore – Proyecto móvil con API
 
-Aplicación de práctica desarrollada en la materia **Desarrollo de Aplicaciones Web**.  
-El proyecto **BookStore** consiste en una aplicación móvil creada con **Expo (React Native + TypeScript)** que permite inicializar una app básica y, de manera opcional, conectarla a un **API REST en Node.js + Express** para simular un catálogo de libros.
+Aplicación móvil desarrollada en la materia **Desarrollo de Aplicaciones Web**.  
 
----
-
-## 📌 Descripción general
-
-El sistema **BookStore** tiene como objetivo:
-- Aprender a **crear y ejecutar aplicaciones móviles** con Expo Go.
-- Practicar la **estructura de un proyecto moderno** en React Native con TypeScript.
-- Simular la comunicación con un servidor backend básico (Express) para obtener datos de ejemplo.
-
-Se trata de un proyecto educativo, diseñado como base para prácticas posteriores.
+BookStore es una app tipo **biblioteca personal** que permite consultar, agregar, editar, eliminar y marcar como favoritos diferentes libros.  
+La app móvil está construida con **Expo (React Native + TypeScript)** y consume una **API REST** desarrollada en **Node.js + Express + TypeScript**.
 
 ---
 
-## 📌 Estado del proyecto
+## 🧩 Objetivo del proyecto
 
-📍 **Estado actual:** *En desarrollo*.  
-- ✅ App móvil inicializada y funcionando en Expo Go.  
-- ✅ Conexión opcional a una API Express local.  
-- ⚙️ Planeado: añadir pantallas de navegación, manejo de estado global y estilos avanzados con NativeWind.  
-- 🚧 El proyecto **no está finalizado**: se encuentra en etapa de prácticas y puede expandirse en el futuro.
-
----
-
-## 📌 Requisitos del entorno
-
-Para ejecutar el proyecto necesitas:
-
-- **Sistema operativo**: Windows 10/11, macOS o Linux  
-- **Node.js**: versión LTS (18.x o superior)  
-- **Gestor de paquetes**: Yarn o npm  
-- **Expo CLI** (se instala automáticamente con `npx`)  
-- **Visual Studio Code** (editor recomendado)  
-- **Expo Go** instalado en tu celular (Android o iOS)  
-- Que **PC y celular estén conectados a la misma red Wi-Fi**
+- Practicar la creación de una **app móvil** con Expo / React Native.
+- Consumir una **API REST real** alojada en la misma red local.
+- Implementar un flujo **CRUD completo** (Create, Read, Update, Delete) para libros.
+- Manejar **navegación** con Stack + Tabs, estado, favoritos y almacenamiento local.
+- Entregar un proyecto integrador que combine **frontend móvil + backend**.
 
 ---
 
-## 📌 Instalación y funcionamiento
+## 🛠 Tecnologías utilizadas
 
-### 🔹 App móvil (Expo)
-```bash
-cd C:\Proyectos\BookStore
-npm install
-npx expo start --tunnel
+### Frontend (móvil)
 
+- React Native + Expo
+- TypeScript
+- React Navigation (Stack + Bottom Tabs)
+- AsyncStorage (favoritos offline)
+- Fetch API (llamadas HTTP)
+- Estilos con StyleSheet
+
+### Backend (API)
+
+- Node.js
+- Express
+- TypeScript
+- CORS
+- Persistencia sencilla en archivo `books.json`
+
+---
+
+## 🧱 Estructura general del proyecto
+
+El proyecto está dividido en dos carpetas principales:
+
+```txt
+C:\Proyectos\
+ ├─ BookStore\        # App móvil (Expo / React Native)
+ └─ api\              # API REST (Node.js + Express + TypeScript)
