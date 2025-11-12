@@ -12,11 +12,11 @@ export type Book = {
 };
 
 async function http<T>(url: string, init?: RequestInit): Promise<T> {
-  const ctl = new AbortController();
-  const id = setTimeout(() => ctl.abort(), API_TIMEOUT);
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), API_TIMEOUT);
 
   try {
-    const res = await fetch(url, { signal: ctl.signal, ...init });
+    const res = await fetch(url, { signal: controller.signal, ...(init || {}) });
 
     if (!res.ok) {
       const txt = await res.text().catch(() => '');
@@ -29,30 +29,23 @@ async function http<T>(url: string, init?: RequestInit): Promise<T> {
   }
 }
 
-// LISTAR TODOS
-export const fetchBooks = (): Promise<Book[]> =>
+export const fetchBooks = () =>
   http<Book[]>(`${API_URL}/api/books`);
 
-// DETALLE POR ID
-export const fetchBookById = (id: number): Promise<Book> =>
+export const fetchBookById = (id: number) =>
   http<Book>(`${API_URL}/api/books/${id}`);
 
-// ELIMINAR
-export const deleteBookById = (id: number): Promise<{ ok: true }> =>
+export const deleteBookById = (id: number) =>
   http<{ ok: true }>(`${API_URL}/api/books/${id}`, { method: 'DELETE' });
 
-// CREAR
-export type BookPayload = Omit<Book, 'id'>;
-
-export const createBook = (data: BookPayload): Promise<Book> =>
+export const createBook = (data: Omit<Book, 'id'>) =>
   http<Book>(`${API_URL}/api/books`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
 
-// ACTUALIZAR
-export const updateBook = (id: number, data: BookPayload): Promise<Book> =>
+export const updateBook = (id: number, data: Partial<Omit<Book, 'id'>>) =>
   http<Book>(`${API_URL}/api/books/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },

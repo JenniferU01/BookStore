@@ -10,19 +10,17 @@ type Props = {
 
 export default function BookItem({ book, onPress }: Props) {
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+    >
       <View style={styles.row}>
         {book.cover ? (
           <Image source={{ uri: book.cover }} style={styles.cover} />
-        ) : (
-          <View style={[styles.cover, styles.coverPlaceholder]} />
-        )}
-
+        ) : null}
         <View style={styles.info}>
-          <Text style={styles.title} numberOfLines={1}>
-            {book.title}
-          </Text>
-          <Text style={styles.meta} numberOfLines={1}>
+          <Text style={styles.title}>{book.title}</Text>
+          <Text style={styles.meta}>
             {book.author} • {book.year}
           </Text>
         </View>
@@ -35,35 +33,34 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
     borderRadius: 14,
-    padding: 12,
     marginBottom: 12,
-    elevation: 3,
+    padding: 10,
+    elevation: 4,
   },
   pressed: {
-    opacity: 0.8,
+    opacity: 0.7,
   },
   row: {
     flexDirection: 'row',
-    alignItems: 'center',
   },
   cover: {
-    width: 56,
-    height: 80,
+    width: 60,
+    height: 90,
     borderRadius: 8,
-    marginRight: 12,
-  },
-  coverPlaceholder: {
+    marginRight: 10,
     backgroundColor: '#eee',
   },
   info: {
     flex: 1,
+    justifyContent: 'center',
   },
   title: {
-    fontSize: 17,
     fontWeight: '600',
+    fontSize: 16,
   },
   meta: {
-    marginTop: 4,
+    fontSize: 12,
     color: '#666',
+    marginTop: 4,
   },
 });

@@ -4,12 +4,13 @@ import {
   ActivityIndicator,
   FlatList,
   RefreshControl,
-  StyleSheet,
-  Text,
   View,
+  Text,
+  StyleSheet,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 import type { RootStackParamList } from '../navigation/types';
 import { fetchBooks, type Book } from '../services/books.api';
 import { getFavIds } from '../services/favs.store';
@@ -26,22 +27,22 @@ export default function FavoritesScreen() {
     setLoading(true);
     try {
       const [books, favs] = await Promise.all([fetchBooks(), getFavIds()]);
-      setData((books as Book[]).filter((b: Book) => favs.includes(b.id)));
-    } catch (e) {
-      console.log(e);
+      const onlyFavs = books.filter((b: Book) => favs.includes(b.id));
+      setData(onlyFavs);
+    } catch {
+      // opcional Alert
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
-    const unsub = navigation.addListener('focus', load);
-    return unsub;
-  }, [navigation]);
+    load();
+  }, []);
 
   if (loading && !data.length) {
     return (
-      <View style={s.center}>
+      <View style={styles.center}>
         <ActivityIndicator size="large" />
       </View>
     );
@@ -49,20 +50,20 @@ export default function FavoritesScreen() {
 
   if (!data.length) {
     return (
-      <View style={s.center}>
+      <View style={styles.center}>
         <Text>No tienes libros favoritos aún.</Text>
       </View>
     );
   }
 
   return (
-    <FlatList
+    <FlatList<Book>
       data={data}
-      keyExtractor={b => String(b.id)}
+      keyExtractor={(b) => String(b.id)}
       refreshControl={
         <RefreshControl refreshing={loading} onRefresh={load} />
       }
-      contentContainerStyle={{ padding: 12, paddingBottom: 24 }}
+      contentContainerStyle={{ padding: 16, paddingBottom: 24 }}
       renderItem={({ item }) => (
         <BookItem
           book={item}
@@ -78,10 +79,6 @@ export default function FavoritesScreen() {
   );
 }
 
-const s = StyleSheet.create({
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+const styles = StyleSheet.create({
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 });
