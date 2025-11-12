@@ -1,11 +1,16 @@
-import 'react-native-gesture-handler';
+// App.tsx (raíz del proyecto BookStore)
+
 import React from 'react';
-import { View, Text } from 'react-native';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import { useColorScheme } from 'react-native';
+import AppNavigation from './src/navigation/navigation';
 
 export default function App() {
+  const scheme = useColorScheme();
+
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Hola Expo 👋</Text>
-    </View>
+    <NavigationContainer theme={scheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <AppNavigation />
+    </NavigationContainer>
   );
 }

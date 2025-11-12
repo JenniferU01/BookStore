@@ -42,8 +42,9 @@ Para ejecutar el proyecto necesitas:
 
 ## 📌 Instalación y funcionamiento
 
-### 🔹 Frontend (client)
+### 🔹 App móvil (Expo)
 ```bash
-cd client
-yarn install        # o npm install
+cd C:\Proyectos\BookStore
+npm install
 npx expo start --tunnel
+
