@@ -11,7 +11,13 @@ import {
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
-import { createBook, fetchBookById, updateBook, type Book } from '../services/books.api';
+import {
+  createBook,
+  fetchBookById,
+  updateBook,
+  type Book,
+  type BookPayload,
+} from '../services/books.api';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'BookForm'>;
 
@@ -34,12 +40,8 @@ export default function BookFormScreen({ route, navigation }: Props) {
   });
 
   useEffect(() => {
-    if (!id) {
-      navigation.setOptions({ title: 'Nuevo libro' });
-      return;
-    }
+    if (!id) return;
 
-    navigation.setOptions({ title: 'Editar libro' });
     (async () => {
       try {
         const b = await fetchBookById(id);
@@ -50,14 +52,18 @@ export default function BookFormScreen({ route, navigation }: Props) {
           cover: b.cover ?? '',
           description: b.description ?? '',
         });
-      } catch {
-        Alert.alert('Error', 'No se pudo cargar el libro.');
+      } catch (e: any) {
+        Alert.alert('Error', e?.message ?? 'No se pudo cargar el libro.');
       }
     })();
-  }, [id, navigation]);
+  }, [id]);
+
+  const onChange = (field: keyof FormValues, value: string) => {
+    setValues(v => ({ ...v, [field]: value }));
+  };
 
   const onSave = async () => {
-    const payload: Omit<Book, 'id'> = {
+    const payload: BookPayload = {
       title: values.title.trim(),
       author: values.author.trim(),
       year: Number(values.year) || new Date().getFullYear(),
@@ -73,10 +79,11 @@ export default function BookFormScreen({ route, navigation }: Props) {
     try {
       if (id) await updateBook(id, payload);
       else await createBook(payload);
+
       Alert.alert('Listo', 'Libro guardado correctamente.');
       navigation.goBack();
     } catch (e: any) {
-      Alert.alert('Error', e?.message ?? 'No se pudo guardar.');
+      Alert.alert('Error', e?.message ?? 'No se pudo guardar');
     }
   };
 
@@ -85,29 +92,29 @@ export default function BookFormScreen({ route, navigation }: Props) {
       <Input
         label="Título"
         value={values.title}
-        onChangeText={(text) => setValues((v) => ({ ...v, title: text }))}
+        onChangeText={t => onChange('title', t)}
       />
       <Input
         label="Autor"
         value={values.author}
-        onChangeText={(text) => setValues((v) => ({ ...v, author: text }))}
+        onChangeText={t => onChange('author', t)}
       />
       <Input
         label="Año"
         keyboardType="numeric"
         value={values.year}
-        onChangeText={(text) => setValues((v) => ({ ...v, year: text }))}
+        onChangeText={t => onChange('year', t)}
       />
       <Input
         label="Portada (URL)"
         value={values.cover}
-        onChangeText={(text) => setValues((v) => ({ ...v, cover: text }))}
+        onChangeText={t => onChange('cover', t)}
       />
       <Input
         label="Descripción"
-        value={values.description}
-        onChangeText={(text) => setValues((v) => ({ ...v, description: text }))}
         multiline
+        value={values.description}
+        onChangeText={t => onChange('description', t)}
       />
 
       <TouchableOpacity style={s.btn} onPress={onSave}>
@@ -120,7 +127,7 @@ export default function BookFormScreen({ route, navigation }: Props) {
 type InputProps = {
   label: string;
   value: string;
-  onChangeText: (txt: string) => void;
+  onChangeText: (text: string) => void;
   keyboardType?: 'default' | 'numeric';
   multiline?: boolean;
 };
@@ -129,37 +136,35 @@ function Input({ label, ...rest }: InputProps) {
   return (
     <View style={{ marginBottom: 12 }}>
       <Text style={s.label}>{label}</Text>
-      <TextInput {...rest} style={[s.input, rest.multiline && s.inputMultiline]} />
+      <TextInput style={s.input} {...rest} />
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: { padding: 16 },
-  label: { marginBottom: 6, color: '#555' },
+  wrap: {
+    padding: 16,
+  },
+  label: {
+    marginBottom: 6,
+    color: '#555',
+  },
   input: {
     borderWidth: 1,
     borderColor: '#ddd',
-    paddingHorizontal: 10,
-    paddingVertical: 8,
     borderRadius: 8,
-    fontSize: 16,
-    backgroundColor: '#fff',
-  },
-  inputMultiline: {
-    minHeight: 80,
-    textAlignVertical: 'top',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
   },
   btn: {
     marginTop: 16,
     backgroundColor: '#6c5ce7',
     paddingVertical: 12,
-    borderRadius: 10,
+    borderRadius: 8,
     alignItems: 'center',
   },
   btnTxt: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 16,
   },
 });

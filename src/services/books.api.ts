@@ -8,6 +8,7 @@ export type Book = {
   year: number;
   cover?: string;
   description?: string;
+  content?: string;
 };
 
 async function http<T>(url: string, init?: RequestInit): Promise<T> {
@@ -16,31 +17,42 @@ async function http<T>(url: string, init?: RequestInit): Promise<T> {
 
   try {
     const res = await fetch(url, { signal: ctl.signal, ...init });
+
     if (!res.ok) {
       const txt = await res.text().catch(() => '');
       throw new Error(`HTTP ${res.status} ${res.statusText} - ${txt}`);
     }
+
     return (await res.json()) as T;
   } finally {
     clearTimeout(id);
   }
 }
 
-export const fetchBooks = () => http<Book[]>(`${API_URL}/api/books`);
-export const fetchBookById = (id: number) => http<Book>(`${API_URL}/api/books/${id}`);
-export const deleteBookById = (id: number) =>
+// LISTAR TODOS
+export const fetchBooks = (): Promise<Book[]> =>
+  http<Book[]>(`${API_URL}/api/books`);
+
+// DETALLE POR ID
+export const fetchBookById = (id: number): Promise<Book> =>
+  http<Book>(`${API_URL}/api/books/${id}`);
+
+// ELIMINAR
+export const deleteBookById = (id: number): Promise<{ ok: true }> =>
   http<{ ok: true }>(`${API_URL}/api/books/${id}`, { method: 'DELETE' });
 
-type OmitId = Omit<Book, 'id'>;
+// CREAR
+export type BookPayload = Omit<Book, 'id'>;
 
-export const createBook = (data: OmitId) =>
+export const createBook = (data: BookPayload): Promise<Book> =>
   http<Book>(`${API_URL}/api/books`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
 
-export const updateBook = (id: number, data: Partial<OmitId>) =>
+// ACTUALIZAR
+export const updateBook = (id: number, data: BookPayload): Promise<Book> =>
   http<Book>(`${API_URL}/api/books/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },

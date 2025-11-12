@@ -4,13 +4,13 @@ import {
   ActivityIndicator,
   FlatList,
   RefreshControl,
-  View,
-  TouchableOpacity,
+  StyleSheet,
   Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
 import type { RootStackParamList } from '../navigation/types';
 import { fetchBooks, type Book } from '../services/books.api';
 import BookItem from '../components/BookItem';
@@ -27,19 +27,36 @@ export default function HomeScreen() {
     try {
       const books = await fetchBooks();
       setData(books);
+    } catch (e) {
+      console.log(e);
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
-    load();
-  }, []);
+    const unsub = navigation.addListener('focus', load);
+    return unsub;
+  }, [navigation]);
 
-  if (loading) {
+  if (loading && !data.length) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center' }}>
+      <View style={s.center}>
         <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (!data.length) {
+    return (
+      <View style={s.center}>
+        <Text>No hay libros. Agrega el primero.</Text>
+        <TouchableOpacity
+          style={s.btn}
+          onPress={() => navigation.navigate('BookForm', {})}
+        >
+          <Text style={s.btnTxt}>Nuevo libro</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -47,29 +64,48 @@ export default function HomeScreen() {
   return (
     <FlatList
       data={data}
-      keyExtractor={(b) => String(b.id)}
-      refreshControl={<RefreshControl refreshing={loading} onRefresh={load} />}
+      keyExtractor={b => String(b.id)}
+      refreshControl={
+        <RefreshControl refreshing={loading} onRefresh={load} />
+      }
       contentContainerStyle={{ padding: 12, paddingBottom: 24 }}
       renderItem={({ item }) => (
         <BookItem
           book={item}
-          onPress={() => navigation.navigate('BookDetails', { id: item.id, title: item.title })}
+          onPress={() =>
+            navigation.navigate('BookDetails', {
+              id: item.id,
+              title: item.title,
+            })
+          }
         />
       )}
       ListFooterComponent={
         <TouchableOpacity
-          style={{
-            marginTop: 8,
-            backgroundColor: '#6c5ce7',
-            paddingVertical: 12,
-            borderRadius: 12,
-            alignItems: 'center',
-          }}
+          style={[s.btn, { marginTop: 16 }]}
           onPress={() => navigation.navigate('BookForm', {})}
         >
-          <Text style={{ color: '#fff', fontWeight: '600' }}>+ Agregar libro</Text>
+          <Text style={s.btnTxt}>Agregar otro libro</Text>
         </TouchableOpacity>
       }
     />
   );
 }
+
+const s = StyleSheet.create({
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  btn: {
+    backgroundColor: '#6c5ce7',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  btnTxt: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+});

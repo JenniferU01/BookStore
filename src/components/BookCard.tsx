@@ -1,21 +1,31 @@
 // src/components/BookCard.tsx
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Image } from 'expo-image';
-import type { Book } from '../navigation/types';
+import type { Book } from '../services/books.api';
 
-type Props = { item: Book; onPress: () => void; };
+type Props = { item: Book; onPress: () => void };
 
 export default function BookCard({ item, onPress }: Props) {
   const uri = item.cover || 'https://placehold.co/600x900?text=No+Cover';
+
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.85} style={styles.wrap}>
-      <LinearGradient colors={['#101828', '#475467']} style={styles.card} start={{x:0,y:0}} end={{x:1,y:1}}>
-        <Image source={{ uri }} style={styles.cover} contentFit="cover" transition={120}/>
-        <View style={styles.info}>
-          <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
-          <Text style={styles.meta} numberOfLines={1}>{item.author} • {item.year}</Text>
+      <LinearGradient
+        colors={['#101828', '#745467']}
+        style={styles.card}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <Image source={{ uri }} style={styles.cover} resizeMode="cover" />
+
+        <View style={styles.texts}>
+          <Text numberOfLines={1} style={styles.title}>
+            {item.title}
+          </Text>
+          <Text numberOfLines={1} style={styles.meta}>
+            {item.author} • {item.year}
+          </Text>
         </View>
       </LinearGradient>
     </TouchableOpacity>
@@ -23,10 +33,37 @@ export default function BookCard({ item, onPress }: Props) {
 }
 
 const styles = StyleSheet.create({
-  wrap: { marginHorizontal: 14, marginVertical: 8 },
-  card: { borderRadius: 16, overflow: 'hidden', height: 120, flexDirection: 'row', elevation: 3 },
-  cover: { width: 90, height: '100%' },
-  info: { flex: 1, padding: 12, justifyContent: 'center' },
-  title: { color: 'white', fontSize: 18, fontWeight: '700' },
-  meta: { color: '#E5E7EB', marginTop: 4 }
+  wrap: {
+    height: 170,
+    marginHorizontal: 16,
+    marginVertical: 8,
+    borderRadius: 18,
+    overflow: 'hidden',
+    elevation: 4,
+    backgroundColor: '#111',
+  },
+  card: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  cover: {
+    width: '40%',
+    height: '100%',
+  },
+  texts: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 4,
+  },
+  meta: {
+    fontSize: 14,
+    color: '#e0e0e0',
+  },
 });
