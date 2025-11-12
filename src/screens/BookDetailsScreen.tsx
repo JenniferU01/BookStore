@@ -64,16 +64,14 @@ export default function BookDetailsScreen({ route, navigation }: Props) {
   };
 
   const onShare = async () => {
-    if (!book) return;
-
     try {
-      const base = `${book.title} – ${book.author} (${book.year})`;
-      const extra =
-        book.description || book.content
-          ? '\n\n' + (book.description ?? book.content ?? '')
-          : '';
+      if (!book) return;
 
-      await Share.share({ message: base + extra });
+      const message = `${book.title} – ${book.author} (${book.year})${
+        book.description ? '\n\n' + book.description : ''
+      }`;
+
+      await Share.share({ message });
     } catch {
       Alert.alert('Error', 'No se pudo compartir.');
     }
@@ -96,7 +94,6 @@ export default function BookDetailsScreen({ route, navigation }: Props) {
       />
 
       <Text style={styles.title}>{book.title}</Text>
-
       <Text style={styles.meta}>
         {book.author} • {book.year}
       </Text>
@@ -108,12 +105,17 @@ export default function BookDetailsScreen({ route, navigation }: Props) {
         </>
       )}
 
-      {!!book.content && (
-        <>
-          <Text style={styles.sectionTitle}>Contenido</Text>
-          <Text style={styles.content}>{book.content}</Text>
-        </>
-      )}
+      <TouchableOpacity
+        style={styles.readBtn}
+        onPress={() =>
+          navigation.navigate('BookReader', {
+            id: book.id,
+            title: book.title,
+          })
+        }
+      >
+        <Text style={styles.readTxt}>📖 Leer libro</Text>
+      </TouchableOpacity>
 
       <View style={styles.row}>
         <TouchableOpacity
@@ -150,52 +152,43 @@ export default function BookDetailsScreen({ route, navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  wrap: {
-    padding: 16,
-    paddingBottom: 32,
-    backgroundColor: '#f5f6fa',
-  },
+  wrap: { padding: 16, paddingBottom: 32 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   cover: {
     width: '100%',
     height: 260,
-    borderRadius: 20,
+    borderRadius: 16,
     marginBottom: 16,
     backgroundColor: '#eee',
   },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    marginBottom: 4,
-    color: '#2d3436',
-  },
-  meta: {
-    fontSize: 14,
-    color: '#636e72',
-    marginBottom: 16,
-  },
+  title: { fontSize: 22, fontWeight: '700', marginBottom: 4 },
+  meta: { fontSize: 14, color: '#666', marginBottom: 12 },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    marginTop: 8,
     marginBottom: 6,
     color: '#2d3436',
   },
-  desc: {
-    fontSize: 15,
-    lineHeight: 22,
-    marginBottom: 12,
-    color: '#2f3640',
-  },
-  content: {
-    fontSize: 15,
-    lineHeight: 24,
+  desc: { fontSize: 15, lineHeight: 22, marginBottom: 16 },
+  readBtn: {
     marginBottom: 20,
-    color: '#2f3640',
-    textAlign: 'justify',
+    backgroundColor: '#1e293b',
+    paddingVertical: 10,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  readTxt: {
+    color: '#f9fafb',
+    fontWeight: '600',
+    fontSize: 15,
   },
   row: { flexDirection: 'row', gap: 12, marginBottom: 12 },
-  btn: { flex: 1, paddingVertical: 10, borderRadius: 12, alignItems: 'center' },
+  btn: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
   btnTxt: { color: '#fff', fontWeight: '600' },
   deleteBtn: {
     marginTop: 8,

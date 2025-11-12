@@ -9,20 +9,27 @@ type Props = {
 };
 
 export default function BookItem({ book, onPress }: Props) {
+  const uri = book.cover || 'https://placehold.co/200x300?text=Book';
+
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
       <View style={styles.row}>
-        {book.cover ? (
-          <Image source={{ uri: book.cover }} style={styles.cover} />
-        ) : null}
+        <Image source={{ uri }} style={styles.cover} />
         <View style={styles.info}>
-          <Text style={styles.title}>{book.title}</Text>
-          <Text style={styles.meta}>
+          <Text style={styles.title} numberOfLines={2}>
+            {book.title}
+          </Text>
+          <Text style={styles.meta} numberOfLines={1}>
             {book.author} • {book.year}
           </Text>
+          {!!book.description && (
+            <Text style={styles.desc} numberOfLines={2}>
+              {book.description}
+            </Text>
+          )}
         </View>
       </View>
     </Pressable>
@@ -61,6 +68,11 @@ const styles = StyleSheet.create({
   meta: {
     fontSize: 12,
     color: '#666',
+    marginTop: 4,
+  },
+  desc: {
+    fontSize: 12,
+    color: '#444',
     marginTop: 4,
   },
 });

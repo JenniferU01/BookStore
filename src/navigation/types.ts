@@ -10,4 +10,5 @@ export type RootStackParamList = {
   Tabs: undefined;
   BookDetails: { id: number; title?: string };
   BookForm: { id?: number };
+  BookReader: { id: number; title?: string };
 };

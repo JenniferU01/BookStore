@@ -15,6 +15,7 @@ import BookDetailsScreen from '../screens/BookDetailsScreen';
 import BookFormScreen from '../screens/BookFormScreen';
 import FavoritesScreen from '../screens/FavoritesScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import BookReaderScreen from '../screens/BookReaderScreen';
 import type { RootStackParamList, RootTabParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -83,6 +84,11 @@ export default function AppNavigation() {
           name="BookForm"
           component={BookFormScreen}
           options={{ title: 'Libro' }}
+        />
+        <Stack.Screen
+          name="BookReader"
+          component={BookReaderScreen}
+          options={{ title: 'Lectura' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

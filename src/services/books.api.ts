@@ -1,6 +1,5 @@
 // src/services/books.api.ts
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_URL } from './config';
+import { API_URL, API_TIMEOUT } from './config';
 
 export type Book = {
   id: number;
@@ -12,51 +11,46 @@ export type Book = {
   cover?: string;
 };
 
-async function retryFetch(url: string, options?: any) {
-  for (let i = 0; i < 2; i++) {
-    try {
-      const res = await fetch(url, options);
-      if (!res.ok) throw new Error('Error en la API');
-      return await res.json();
-    } catch (e) {
-      if (i === 1) throw e;
-    }
-  }
-}
+async function http<T>(url: string, init?: RequestInit): Promise<T> {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), API_TIMEOUT);
 
-export async function fetchBooks(): Promise<Book[]> {
   try {
-    const data = await retryFetch(`${API_URL}/api/books`);
-    await AsyncStorage.setItem('books_cache', JSON.stringify(data));
-    return data;
-  } catch {
-    const cache = await AsyncStorage.getItem('books_cache');
-    return cache ? JSON.parse(cache) : [];
+    const res = await fetch(url, {
+      signal: controller.signal,
+      ...(init || {}),
+    });
+
+    if (!res.ok) {
+      const txt = await res.text().catch(() => '');
+      throw new Error(`HTTP ${res.status} ${res.statusText} - ${txt}`);
+    }
+
+    return (await res.json()) as T;
+  } finally {
+    clearTimeout(id);
   }
 }
 
-export async function fetchBookById(id: number): Promise<Book> {
-  return retryFetch(`${API_URL}/api/books/${id}`);
-}
+export const fetchBooks = () =>
+  http<Book[]>(`${API_URL}/api/books`);
 
-export async function createBook(book: Partial<Book>) {
-  return retryFetch(`${API_URL}/api/books`, {
+export const fetchBookById = (id: number) =>
+  http<Book>(`${API_URL}/api/books/${id}`);
+
+export const deleteBookById = (id: number) =>
+  http<{ ok?: true }>(`${API_URL}/api/books/${id}`, { method: 'DELETE' });
+
+export const createBook = (data: Omit<Book, 'id'>) =>
+  http<Book>(`${API_URL}/api/books`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(book),
+    body: JSON.stringify(data),
   });
-}
 
-export async function updateBook(id: number, book: Partial<Book>) {
-  return retryFetch(`${API_URL}/api/books/${id}`, {
+export const updateBook = (id: number, data: Partial<Omit<Book, 'id'>>) =>
+  http<Book>(`${API_URL}/api/books/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(book),
+    body: JSON.stringify(data),
   });
-}
-
-export async function deleteBookById(id: number) {
-  return retryFetch(`${API_URL}/api/books/${id}`, {
-    method: 'DELETE',
-  });
-}

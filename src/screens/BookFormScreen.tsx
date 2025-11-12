@@ -27,6 +27,7 @@ type FormValues = {
   year: string;
   cover?: string;
   description?: string;
+  content?: string;
 };
 
 export default function BookFormScreen({ route, navigation }: Props) {
@@ -37,6 +38,7 @@ export default function BookFormScreen({ route, navigation }: Props) {
     year: new Date().getFullYear().toString(),
     cover: '',
     description: '',
+    content: '',
   });
 
   useEffect(() => {
@@ -51,6 +53,7 @@ export default function BookFormScreen({ route, navigation }: Props) {
           year: String(b.year),
           cover: b.cover ?? '',
           description: b.description ?? '',
+          content: b.content ?? '',
         });
       } catch (e: any) {
         Alert.alert('Error', e?.message ?? 'No se pudo cargar el libro.');
@@ -71,7 +74,7 @@ export default function BookFormScreen({ route, navigation }: Props) {
       year: Number(values.year) || new Date().getFullYear(),
       cover: values.cover?.trim() || undefined,
       description: values.description?.trim() || undefined,
-      content: undefined,
+      content: values.content?.trim() || undefined,
     };
 
     if (!payload.title || !payload.author) {
@@ -119,6 +122,12 @@ export default function BookFormScreen({ route, navigation }: Props) {
         onChangeText={onChange('description')}
         multiline
       />
+      <Input
+        label="Contenido (texto del libro)"
+        value={values.content}
+        onChangeText={onChange('content')}
+        multiline
+      />
 
       <TouchableOpacity style={styles.btn} onPress={onSave}>
         <Text style={styles.btnTxt}>Guardar</Text>
@@ -155,6 +164,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 8,
+    minHeight: 40,
+    textAlignVertical: 'top',
+    backgroundColor: '#fff',
   },
   btn: {
     marginTop: 16,

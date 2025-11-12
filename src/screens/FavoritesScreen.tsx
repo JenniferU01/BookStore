@@ -29,16 +29,17 @@ export default function FavoritesScreen() {
       const [books, favs] = await Promise.all([fetchBooks(), getFavIds()]);
       const onlyFavs = books.filter((b: Book) => favs.includes(b.id));
       setData(onlyFavs);
-    } catch {
-      // opcional Alert
+    } catch (e) {
+      console.log('Error cargando favoritos', e);
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
-    load();
-  }, []);
+    const unsubscribe = navigation.addListener('focus', load);
+    return unsubscribe;
+  }, [navigation]);
 
   if (loading && !data.length) {
     return (
