@@ -30,13 +30,17 @@ export const fetchBooks = () => http<Book[]>(`${API_URL}/api/books`);
 export const fetchBookById = (id: number) => http<Book>(`${API_URL}/api/books/${id}`);
 export const deleteBookById = (id: number) =>
   http<{ ok: true }>(`${API_URL}/api/books/${id}`, { method: 'DELETE' });
-export const createBook = (data: Omit<Book, 'id'>) =>
+
+type OmitId = Omit<Book, 'id'>;
+
+export const createBook = (data: OmitId) =>
   http<Book>(`${API_URL}/api/books`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-export const updateBook = (id: number, data: Partial<Omit<Book, 'id'>>) =>
+
+export const updateBook = (id: number, data: Partial<OmitId>) =>
   http<Book>(`${API_URL}/api/books/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },

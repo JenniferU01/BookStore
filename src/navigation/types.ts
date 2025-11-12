@@ -2,8 +2,8 @@
 
 export type RootStackParamList = {
   Tabs: undefined;
-  BookDetails: { id: number };
-  BookForm: { id?: number }; // id opcional para editar
+  BookDetails: { id: number; title?: string };
+  BookForm: { id?: number } | undefined;
 };
 
 export type RootTabParamList = {

@@ -1,4 +1,4 @@
-// App.tsx (raíz del proyecto BookStore)
+// App.tsx (raíz)
 
 import React from 'react';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';

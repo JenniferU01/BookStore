@@ -1,43 +1,70 @@
 // src/screens/FavoritesScreen.tsx
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, SafeAreaView, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  Text,
+  View,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+import type { RootStackParamList } from '../navigation/types';
 import { fetchBooks, type Book } from '../services/books.api';
 import { getFavIds } from '../services/favs.store';
 import BookItem from '../components/BookItem';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Tabs'>;
+type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-export default function FavoritesScreen({ navigation }: Props) {
-  const [loading, setLoading] = useState(true);
+export default function FavoritesScreen() {
+  const navigation = useNavigation<Nav>();
   const [data, setData] = useState<Book[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const [books, favs] = await Promise.all([fetchBooks(), getFavIds()]);
+      setData(books.filter((b) => favs.includes(b.id)));
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    const load = navigation.addListener('focus', async () => {
-      setLoading(true);
-      const [all, favs] = await Promise.all([fetchBooks(), getFavIds()]);
-      setData(all.filter(b => favs.includes(b.id)));
-      setLoading(false);
-    });
-    return load;
+    const unsub = navigation.addListener('focus', load);
+    return unsub;
   }, [navigation]);
 
-  if (loading) return <View style={{ flex: 1, justifyContent: 'center' }}><ActivityIndicator /></View>;
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (!data.length) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>No tienes libros favoritos aún.</Text>
+      </View>
+    );
+  }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <FlatList
-        data={data}
-        keyExtractor={(b) => String(b.id)}
-        renderItem={({ item }) => (
-          <BookItem
-            book={item}
-            onPress={() => navigation.navigate('BookDetails', { id: item.id, title: item.title })}
-          />
-        )}
-        contentContainerStyle={{ paddingVertical: 8 }}
-      />
-    </SafeAreaView>
+    <FlatList
+      data={data}
+      keyExtractor={(b) => String(b.id)}
+      refreshControl={<RefreshControl refreshing={loading} onRefresh={load} />}
+      contentContainerStyle={{ padding: 12, paddingBottom: 24 }}
+      renderItem={({ item }) => (
+        <BookItem
+          book={item}
+          onPress={() => navigation.navigate('BookDetails', { id: item.id, title: item.title })}
+        />
+      )}
+    />
   );
 }
