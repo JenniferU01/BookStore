@@ -64,14 +64,16 @@ export default function BookDetailsScreen({ route, navigation }: Props) {
   };
 
   const onShare = async () => {
+    if (!book) return;
+
     try {
-      if (!book) return;
+      const base = `${book.title} – ${book.author} (${book.year})`;
+      const extra =
+        book.description || book.content
+          ? '\n\n' + (book.description ?? book.content ?? '')
+          : '';
 
-      const message = `${book.title} – ${book.author} (${book.year})${
-        book.description ? '\n\n' + book.description : ''
-      }`;
-
-      await Share.share({ message });
+      await Share.share({ message: base + extra });
     } catch {
       Alert.alert('Error', 'No se pudo compartir.');
     }
@@ -94,11 +96,24 @@ export default function BookDetailsScreen({ route, navigation }: Props) {
       />
 
       <Text style={styles.title}>{book.title}</Text>
+
       <Text style={styles.meta}>
         {book.author} • {book.year}
       </Text>
 
-      {!!book.description && <Text style={styles.desc}>{book.description}</Text>}
+      {!!book.description && (
+        <>
+          <Text style={styles.sectionTitle}>Descripción</Text>
+          <Text style={styles.desc}>{book.description}</Text>
+        </>
+      )}
+
+      {!!book.content && (
+        <>
+          <Text style={styles.sectionTitle}>Contenido</Text>
+          <Text style={styles.content}>{book.content}</Text>
+        </>
+      )}
 
       <View style={styles.row}>
         <TouchableOpacity
@@ -135,12 +150,50 @@ export default function BookDetailsScreen({ route, navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  wrap: { padding: 16, paddingBottom: 32 },
+  wrap: {
+    padding: 16,
+    paddingBottom: 32,
+    backgroundColor: '#f5f6fa',
+  },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  cover: { width: '100%', height: 260, borderRadius: 16, marginBottom: 16, backgroundColor: '#eee' },
-  title: { fontSize: 22, fontWeight: '700', marginBottom: 4 },
-  meta: { fontSize: 14, color: '#666', marginBottom: 12 },
-  desc: { fontSize: 15, lineHeight: 22, marginBottom: 24 },
+  cover: {
+    width: '100%',
+    height: 260,
+    borderRadius: 20,
+    marginBottom: 16,
+    backgroundColor: '#eee',
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: '700',
+    marginBottom: 4,
+    color: '#2d3436',
+  },
+  meta: {
+    fontSize: 14,
+    color: '#636e72',
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    marginTop: 8,
+    marginBottom: 6,
+    color: '#2d3436',
+  },
+  desc: {
+    fontSize: 15,
+    lineHeight: 22,
+    marginBottom: 12,
+    color: '#2f3640',
+  },
+  content: {
+    fontSize: 15,
+    lineHeight: 24,
+    marginBottom: 20,
+    color: '#2f3640',
+    textAlign: 'justify',
+  },
   row: { flexDirection: 'row', gap: 12, marginBottom: 12 },
   btn: { flex: 1, paddingVertical: 10, borderRadius: 12, alignItems: 'center' },
   btnTxt: { color: '#fff', fontWeight: '600' },
